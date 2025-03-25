@@ -1,0 +1,15 @@
+{
+  "name": "version-checker",
+  "description": "Check version for Nintendo Switch",
+  "author": {
+    "name": "Maxime GRIS",
+    "email": "maxime.gris@gmail.com"
+  },
+  "version": "1.0.0",
+  "main": "main.js",
+  "private": true,
+  "dependencies": {
+    "@electron/remote": "2.0.8",
+    "electron-store": "8.1.0"
+  }
+}

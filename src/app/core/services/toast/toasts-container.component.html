@@ -1,0 +1,14 @@
+<ngb-toast *ngFor="let toast of toastService.toasts" [class]="toast.className" [autohide]="toast.autoHide || true"
+  [delay]="toast.delay || 2000" (hidden)="toastService.remove(toast)">
+  <ng-template [ngIf]="toast.template" [ngIfElse]="text">
+    <ng-template [ngTemplateOutlet]="toast.template"></ng-template>
+  </ng-template>
+
+  <ng-template #text>
+    <div class="d-flex">
+      <div>{{ toast.text }}</div>
+      <button type="button" class="btn-close btn-close-white ms-auto" aria-label="Close"
+        (click)="toastService.remove(toast)"></button>
+    </div>
+  </ng-template>
+</ngb-toast>

@@ -1,0 +1,99 @@
+<div class="container-fluid d-flex flex-column h-100">
+  <div class="table-responsive h-100">
+    <table class="table table-bordered align-middle text-center">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col" width="100">Icon</th>
+          <th scope="col" [sortable]="columns" (sort)="onSort($event)" *ngFor="let columns of displayedColumns">
+            {{ columns }}
+          </th>
+          <th scope="col" width="250">nsw2u Version</th>
+          <th scope="col" width="250">DLC</th>
+          <th scope="col" width="250">nsw2u DLC</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of items; let i = index">
+          <th scope="row">{{ i + 1 }}</th>
+          <td *ngVar="titleData[item['Base Title ID']] as titleData">
+            <ng-container [ngTemplateOutlet]="!titleData || !titleData.iconUrl ? loading : icon"></ng-container>
+            <ng-template #icon>
+              <img alt="" [src]="titleData?.iconUrl" class="rounded" width="100" height="100">
+            </ng-template>
+          </td>
+          <td *ngFor="let columns of displayedColumns">{{ item[columns] }}</td>
+          <td *ngVar="nsw2uData[item['Base Title ID']] as nsw2uData">
+            <ng-container
+              [ngTemplateOutlet]="!nsw2uData || !nsw2uData?.gameVersion ? loading : (item['Display Version'] | isNewerVersion : nsw2uData?.gameVersion || '') ? nsw2uUpdateVersion : nsw2uLastVersion">
+            </ng-container>
+            <ng-template #nsw2uUpdateVersion>
+              <button type="button" class="btn btn-danger"
+                (click)="openBrowser('https://nsw2u.com?page_id=' + nsw2uData?.id || '')">
+                Update version {{ nsw2uData?.gameVersion }}
+              </button>
+            </ng-template>
+            <ng-template #nsw2uLastVersion>
+              <button type="button" class="btn btn-primary"
+                (click)="openBrowser('https://nsw2u.com?page_id=' + nsw2uData?.id || '')">
+                {{ nsw2uData?.gameVersion }}
+              </button>
+            </ng-template>
+          </td>
+          <td class="position-relative p-0">
+            <ng-container [ngTemplateOutlet]="!item || !item?.dlc ? loading : dlc"></ng-container>
+            <ng-template #dlc>
+              <ul class="list-group list-group-flush" *ngVar="item?.dlc as dlc">
+                <li class="list-group-item d-flex flex-fill align-items-center justify-content-center h-100"
+                  *ngFor="let d of dlc; let i = index; let last = last">
+                  <ng-container *ngIf="titleData[d['Title ID']]">
+                    {{ titleData[d['Title ID']].name }}
+                  </ng-container>
+                </li>
+              </ul>
+            </ng-template>
+          </td>
+          <td class="position-relative p-0" *ngVar="nsw2uData[item['Base Title ID']] as nsw2uData">
+            <ng-container [ngTemplateOutlet]="!nsw2uData || !nsw2uData?.dlc ? loading : nsw2uDlc"></ng-container>
+            <ng-template #nsw2uDlc>
+              <ul class="list-group list-group-flush" *ngVar="nsw2uData?.dlc as dlc">
+                <li class="list-group-item d-flex flex-fill align-items-center justify-content-center h-100"
+                  *ngFor="let d of dlc; let i = index; let last = last">
+                  {{ d.title }}
+                </li>
+              </ul>
+            </ng-template>
+          </td>
+        </tr>
+        <tr *ngIf="!items.length">
+          <td [colSpan]="5 + displayedColumns.length" class="py-5">
+            <ng-container [ngTemplateOutlet]="spinnerService.loading ? loading : noItem"></ng-container>
+            <ng-template #noItem>
+              No Game
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer py-3">
+    <button class="btn btn-outline-primary me-2" (click)="open()">
+      <app-icon path="mdiCog" class="me-2"></app-icon>
+      <span>Setting</span>
+    </button>
+    <button class="btn btn-outline-primary" (click)="loadData()">
+      <span *ngIf="spinnerService.loading" class="spinner-border spinner-border-sm me-2"></span>
+      <app-icon *ngIf="!spinnerService.loading" path="mdiRefresh" class="me-2"></app-icon>
+      <span>Refresh</span>
+    </button>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="text-center">
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+  </div>
+</ng-template>
